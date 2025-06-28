@@ -15,7 +15,7 @@ const navbar = (
     // ... Your additional navbar options
   />
 )
-const footer = <Footer>MIT {new Date().getFullYear()} © Nextra.</Footer>
+const footer = <Footer>{new Date().getFullYear()} © Space Turtles.</Footer>
  
 export default async function RootLayout({ children }) {
   return (
@@ -38,7 +38,7 @@ export default async function RootLayout({ children }) {
          // banner={banner}
           navbar={navbar}
           pageMap={await getPageMap()}
-          docsRepositoryBase="https://github.com/Spaceturtles-RP/asset_docs/tree/master/content"
+          docsRepositoryBase="https://github.com/Spaceturtles-RP/asset_docs/tree/master"
           footer={footer}
           // ... Your additional layout options
         >

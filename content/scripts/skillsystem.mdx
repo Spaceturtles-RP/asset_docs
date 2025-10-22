@@ -26,12 +26,19 @@ The Skill & Talent System is a modular framework for FiveM servers that allows y
 - Encourage long-term player engagement and specialization.
 
 ## Client-Side Exports
+### `OpenSkills`
+Opens up the Skills & Talent Tree UI for the player.
+
+```lua
+local skillLevel = exports.strp_skills:openSkills()
+```
+
 ### `GetSkillLevel`
 Returns the current level of the given skill.
 
 - **Parameters:**
   - `skillName`: Name of the skill (string)
-- **Returns:** Players current skill level (integer)
+- **Returns:** Players current skill level (integer), Players current XP (integer)
 
 ```lua
 local skillLevel = exports.strp_skills:GetSkillLevel("Trucking")
@@ -55,7 +62,7 @@ Returns the current level of the given skill.
 - **Parameters:**
   - `source`: Affected players sourceid (integer)
   - `skillName`: Name of the skill (string)
-- **Returns:** Players current skill level (integer)
+- **Returns:** Players current skill level (integer), Players current XP (integer)
 
 ```lua
 local skillLevel = exports.strp_skills:GetSkillLevel(source, "Trucking")

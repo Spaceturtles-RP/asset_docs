@@ -38,6 +38,24 @@ strp_skills has the following script dependencies:
 - Inside the ui/data folder there are 2 json files that are also included as dummy data, again, you should replace these to create the talent trees for your new skills you create.
 - To modify the Introduction page, take a look at the ui/index.html file.
 
+## Creating a Talent Tree
+As players level up in a skill, they gain 1 talent point per level. These points can then be spent on the talent tree to unlock whatever advantages you wish to give them.
+
+Each skill should have a corresponding json file with the same name in the ui/data folder. If a skill name has spaces in it, replace these with underscores (_).
+
+- **Talent Object:**
+  - **id**: Unique name given to this talent (you can reuse ids in other talents, but they should be unique per file)
+  - **column**: This determines which column this talent will appear in on your talent tree (don't go beyond 5)
+  - **row**: This determines which row this talent will appear in on your talent tree (go as deep as you like)
+  - **name**: This is the name of this talent shown to players on the talent tree
+  - **description**: This is the description of the talent shown to players on the talent tree
+  - **unlocked**: This should always be false
+  - **icon**: This is the url to the image icon of the talent shown on the talent tree
+  - **dependencies**: 
+    - If your talent is at the start of your tree, this should simply be []
+    - If you want the player to unlock another talent(s) before this one, list them here
+    - For optional dependencies provide a list of options within the list.
+
 ## Client-Side Exports
 ### `OpenSkills`
 Opens up the Skills & Talent Tree UI for the player.

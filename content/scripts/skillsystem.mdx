@@ -1,0 +1,130 @@
+---
+title: Skill & Talent System
+sidebarTitle: Skill System
+---
+
+# Skill & Talent System
+
+The Skill & Talent System is a modular framework for FiveM servers that allows you to add, track, and manage player skills and talents. It is designed to be flexible, extensible, and easy to integrate into any roleplay or other gameplay modes.
+
+**IMPORTANT:** This is a framework for you to implement - you will need to set up and configure skills and talents and then implement them into your own systems.
+
+## Features
+
+- **Custom Skills & Talents:** Define any number of skills (e.g., Hacking, Fishing, Trucking) and talents (e.g., Quick Learner, Night Vision).
+- **Progression & XP:** Players can gain experience and level up skills through actions or events, determined by you.
+- **Talent Trees:** Support for branching talent trees and unlockable abilities.
+- **Server-Side & Client-Side Hooks:** Easily check a players talents and apply their modifiers on both the client & server side.
+- **Persistence:** Player progress is saved and loaded automatically.
+- **Configurable UI:** The frontend is completely open source, feel free to adjust it to your needs.
+
+## Possibilities
+
+- Create RPG-style progression for jobs, criminal activities, or hobbies.
+- Unlock new abilities, perks, or access to items as players develop their characters.
+- Add depth to police, EMS, mechanics, criminals and any other job roles.
+- Encourage long-term player engagement and specialization.
+
+## Available Client-Side Exports
+### `GetSkillLevel`
+Returns the current level of the given skill.
+
+- **Parameters:**
+  - `skillName`: Name of the skill (string)
+- **Returns:** Players current skill level (integer)
+
+```lua
+local skillLevel = exports.strp_skills:GetSkillLevel("Trucking")
+```
+
+### `GetSkillTalents`
+Returns a list of unlocked talents for a given skill and player.
+
+- **Parameters:**
+  - `skillName`: Name of the skill (string)
+- **Returns:** All unlocked talents for skill (strings)
+
+```lua
+local unlockedTalents = exports.strp_skills:GetSkillTalents("Trucking")
+```
+
+## Available Server-Side Exports
+### `GetSkillLevel`
+Returns the current level of the given skill.
+
+- **Parameters:**
+  - `source`: Affected players sourceid (integer)
+  - `skillName`: Name of the skill (string)
+- **Returns:** Players current skill level (integer)
+
+```lua
+local skillLevel = exports.strp_skills:GetSkillLevel(source, "Trucking")
+```
+
+### `GetSkillTalents`
+Returns a list of unlocked talents for a given skill and player.
+
+- **Parameters:**
+  - `source`: Affected players sourceid (integer)
+  - `skillName`: Name of the skill (string)
+- **Returns:** All unlocked talents for skill (strings)
+
+```lua
+local unlockedTalents = exports.strp_skills:GetSkillTalents(source, "Trucking")
+```
+
+### `UpdateJobSkill`
+Adjusts a players XP in any given skill by the provided amount, automatically handling any leveling up or down that occurs.
+
+- **Parameters:**
+  - `source`: Affected players sourceid (integer)
+  - `skillName`: Name of the skill (string)
+  - `XP`: Amount of XP to adjust by (integer)
+  - `AddOrRemove`: Whether to "Add" or "Remove" XP (string)
+
+```lua
+exports.strp_skills:UpdateJobSkill(source, "Trucking", 100, "Add") -- Award the player 100xp
+```
+
+### `ResetTalents`
+Completely resets a players talent tree for a skill, allowing them to re-spend their talent points
+
+- **Parameters:**
+  - `source`: Affected players sourceid (integer)
+  - `skillName`: Name of the skill (string)
+
+```lua
+exports.strp_skills:ResetTalents(source, "Trucking")
+```
+
+## Example Usage
+
+Here is a basic example of how to obtain a list of a users unlocked talents from a specific skill:
+
+```lua
+-- Obtain the source players Trucking talents
+local truckingTalents = exports.strp_skills:GetSkillTalents(source, "Trucking")
+
+-- Setting some base stats
+local basePayMultiplier = 1.1
+local baseLaunderAmountMultiplier = 1.075
+local additionalRate = 0.0
+
+-- Loop through the users trucking talents
+for _, talent in ipairs(truckingTalents) do
+    -- If the talents name begins with "extra_pay", then adjust their bonus payment
+    if string.sub(talent, 1, 9) == "extra_pay" then
+        amount = math.ceil(amount * basePayMultiplier)
+    -- If the talents name begins with "launder_amount", then increase the amount of money laundered
+    elseif string.sub(talent, 1, 14) == "launder_amount" then
+        launderedAmount = math.ceil(launderedAmount * baseLaunderAmountMultiplier)
+    -- If the talents name begins with "launder_rate", then increase the ratio of laundered money
+    elseif string.sub(talent, 1, 12) == "launder_rate" then
+        additionalRate = additionalRate + 0.1
+    end
+end
+
+-- <the rest of your code that then implements these adjusted stats>
+```
+
+Tebex: [Link](https://assets.strp.store/)

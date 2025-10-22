@@ -25,6 +25,17 @@ The Skill & Talent System is a modular framework for FiveM servers that allows y
 - Add depth to police, EMS, mechanics, criminals and any other job roles.
 - Encourage long-term player engagement and specialization.
 
+## Dependencies
+strp_skills has the following script dependencies:
+- [ox_lib](https://github.com/overextended/ox_lib)
+- [oxMySQL](https://github.com/overextended/oxmysql)
+
+## Installation
+- Add this to the end of your server.cfg: ``"ensure strp_skills"``
+- Adjust the included config files, there are 2 dummy skills included as examples, you should remove these and replace them with the skills you set up yourself.
+- Inside the ui/data folder there are 2 json files that are also included as dummy data, again, you should replace these to create the talent trees for your new skills you create.
+- To modify the Introduction page, take a look at the ui/index.html file.
+
 ## Client-Side Exports
 ### `OpenSkills`
 Opens up the Skills & Talent Tree UI for the player.

@@ -1,0 +1,245 @@
+---
+title: Physical Stashes System
+sidebarTitle: Physical Stashes
+---
+
+# Physical Stashes System
+
+The Physical Stashes System is a fully-featured carry and storage framework for FiveM servers that adds physical, interactive cases to your world. Players can pick up, carry, lock, unlock, and store items in physical containers that can be placed on the ground or attached to vehicles.
+
+## Features
+
+- **Physical Carry System:** Players can pick up and carry cases with realistic animations and movement restrictions.
+- **Vehicle Storage:** Attach cases to vehicles for transport, with automatic positioning at the rear of any vehicle.
+- **Lockpicking Mechanic:** Cases spawn locked and require players to break into them using a minigame.
+- **Inventory Integration:** Seamless integration with ox_inventory for item storage.
+- **Multi-Model Support:** Configure unlimited case models with individual settings for appearance, capacity, and carry animations.
+- **Flexible Creation:** Server-side export allows other resources to spawn cases anywhere with extensive customization options.
+- **Drop on Death/Ragdoll:** Realistic physics - players drop cases when killed or knocked down.
+- **Networked State:** Cases sync across all clients with proper state management.
+
+## Possibilities
+
+- Create drug package runs where players transport locked cases to buyers.
+- Evidence collection systems for police - spawn cases at crime scenes.
+- Treasure hunt events with cases spawning at random locations.
+- Delivery jobs requiring players to transport cases between locations.
+- Vehicle robbery - break into cases attached to moving vehicles.
+- Black market deliveries - cases that spawn locked on vehicles.
+- Escape missions - carry valuable cases while avoiding pursuit.
+
+## Dependencies
+strp_physical_stashes has the following script dependencies:
+- [ox_lib](https://github.com/overextended/ox_lib)
+- [ox_inventory](https://github.com/overextended/ox_inventory)
+- [ox_target](https://github.com/overextended/ox_target)
+- [strp_minigames](https://github.com/your-repo/strp_minigames) - For lockpicking mechanic
+
+## Installation
+1. Add `ensure strp_physical_stashes` to your server.cfg
+2. Configure the `shared/config.lua` file:
+   - Set your admin spawn command name
+   - Configure case models with their properties
+3. Restart your server
+
+## Configuration
+
+The config file uses a `Config.CaseModels` table where each entry represents a different case type:
+
+```lua
+Config.CaseModels = {
+    [`ex_prop_adv_case_sm`] = {
+        label = 'Small Case',
+        slots = 20,
+        weight = 20000,  -- in grams
+        bone = 28422,    -- hand bone
+        pos = vector3(0.1, 0.0, -0.05),
+        rot = vector3(0.0, 90.0, 0.0),
+        animDict = 'anim@heists@box_carry@',
+        animName = 'idle'
+    },
+    -- Add more models here
+}
+```
+
+### Model Configuration Properties:
+- **label**: Display name for the stash
+- **slots**: Number of inventory slots
+- **weight**: Maximum weight capacity in grams
+- **bone**: Bone index for attachment to player
+- **pos**: Position offset from bone (vector3)
+- **rot**: Rotation offset (vector3)
+- **animDict**: Animation dictionary to load
+- **animName**: Animation to play while carrying
+
+## Player Controls
+
+- **Look at case + ox_target**: Interact with cases
+  - **Pick Up Case**: Pick up a case from ground or vehicle
+  - **Break into Case**: Attempt lockpicking minigame (only when locked)
+  - **Open Case**: Access inventory (only when unlocked)
+- **X Key (while carrying)**: Place case on ground
+- **Look at vehicle + ox_target (while carrying)**: Store case in vehicle trunk
+
+## Server-Side Export
+
+### `CreateCase`
+Creates a physical case in the world with extensive customization options.
+
+- **Parameters:**
+  - `options`: Table containing configuration options
+- **Returns:** `stashId` (string) - The ox_inventory stash ID, or `nil` on failure
+
+#### Options Table:
+```lua
+{
+    model = hash,           -- (optional) Case model hash
+    coords = vector3,       -- (optional) World coordinates
+    heading = number,       -- (optional) Rotation in degrees
+    attachTo = {
+        entity = number,    -- (optional) Entity handle to attach to
+        bone = number,      -- (optional) Bone index (for peds)
+        offset = vector3,   -- (optional) Position offset
+        rotation = vector3  -- (optional) Rotation offset
+    },
+    locked = boolean,       -- (optional) Starts locked (default: true)
+    label = string,         -- (optional) Stash label
+    slots = number,         -- (optional) Inventory slots
+    weight = number         -- (optional) Max weight in grams
+}
+```
+
+## Example Usage
+
+### Basic Case Spawn
+```lua
+-- Spawn a case at specific coordinates
+local stashId = exports.strp_physical_stashes:CreateCase({
+    coords = vector3(100.0, 200.0, 72.0),
+    heading = 90.0
+})
+```
+
+### Attach to Vehicle
+```lua
+-- Spawn and attach to vehicle rear automatically
+local vehicle = GetVehiclePedIsIn(playerPed, false)
+local stashId = exports.strp_physical_stashes:CreateCase({
+    attachTo = { entity = vehicle }
+})
+```
+
+### Custom Unlocked Case with Items
+```lua
+-- Create an unlocked case with custom capacity
+local stashId = exports.strp_physical_stashes:CreateCase({
+    coords = vector3(100, 200, 72),
+    locked = false,
+    label = "Weapon Cache",
+    slots = 50,
+    weight = 100000
+})
+
+-- Fill it with items
+exports.ox_inventory:AddItem(stashId, 'weapon_pistol', 2)
+exports.ox_inventory:AddItem(stashId, 'ammo-9', 100)
+```
+
+### Drug Delivery Mission
+```lua
+-- Create locked case for drug run
+local dropLocation = vector3(1250.5, -3015.2, 5.9)
+local stashId = exports.strp_physical_stashes:CreateCase({
+    coords = dropLocation,
+    locked = true,
+    label = "Suspicious Package"
+})
+
+-- Pre-fill with contraband
+exports.ox_inventory:AddItem(stashId, 'weed_brick', 5)
+exports.ox_inventory:AddItem(stashId, 'money_roll', 10)
+
+-- Track when player opens it
+RegisterNetEvent('carrycase:server:openStash', function(netId)
+    local src = source
+    -- Your mission completion logic here
+end)
+```
+
+### Evidence Collection System
+```lua
+-- Spawn evidence case at crime scene
+local evidenceCase = exports.strp_physical_stashes:CreateCase({
+    coords = crimeSceneCoords,
+    locked = false,
+    label = "Evidence Container",
+    slots = 30,
+    weight = 50000
+})
+
+-- Police can collect evidence into this case
+```
+
+### Attach to Ped (Courier NPC)
+```lua
+-- Create courier NPC with case
+local courier = CreatePed(4, `a_m_m_business_01`, coords, heading, true, false)
+local stashId = exports.strp_physical_stashes:CreateCase({
+    attachTo = {
+        entity = courier,
+        bone = 28422,  -- hand bone
+        offset = vector3(0.1, 0.0, -0.05),
+        rotation = vector3(0, 90, 0)
+    },
+    locked = true,
+    label = "Courier Package"
+})
+```
+
+### Treasure Hunt Event
+```lua
+-- Spawn multiple treasure cases around map
+local treasureLocations = {
+    vector3(100, 200, 72),
+    vector3(500, 600, 80),
+    vector3(-200, -400, 65)
+}
+
+for i, coords in ipairs(treasureLocations) do
+    local stashId = exports.strp_physical_stashes:CreateCase({
+        coords = coords,
+        locked = true,
+        label = "Treasure Chest #" .. i,
+        slots = 10,
+        weight = 25000
+    })
+    
+    -- Add random loot
+    exports.ox_inventory:AddItem(stashId, 'gold_bar', math.random(1, 3))
+    exports.ox_inventory:AddItem(stashId, 'diamond', math.random(1, 5))
+end
+```
+
+## Admin Commands
+
+- `/spawncase` - Spawns a case at your feet (requires admin/restricted permission)
+
+## State Management
+
+Cases use entity state bags for synchronization:
+- `carrycase:stashId` - The ox_inventory stash identifier
+- `carrycase_locked` - Boolean indicating if case is locked
+
+## Technical Notes
+
+- Cases automatically drop when player dies or is ragdolled
+- Only one case can be attached per vehicle
+- Cases attached to players cannot be picked up by others
+- Cases attached to vehicles can be picked up
+- Breaking into cases requires the `crack-code` minigame type
+- Vehicle attachment uses dimension-based positioning for consistent placement
+- All cases are networked entities with proper migration support
+
+---
+
+Tebex: [Link](https://assets.strp.store/)
